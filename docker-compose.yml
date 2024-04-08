@@ -19,7 +19,7 @@ services:
       - AWS_REGION=us-east-1
     ports:
       - 8888:8888
-      - 8080:8080
+      - 8282:8282
       - 10000:10000
       - 10001:10001
   rest:
@@ -70,5 +70,23 @@ services:
       /usr/bin/mc policy set public minio/warehouse;
       tail -f /dev/null
       "
+  trino:
+    ports:
+      - "8080:8080"
+    image: "trinodb/trino:439"
+    container_name: trino
+    networks:
+      iceberg_net:
+    depends_on:
+      - rest
+      - minio
+    volumes:
+      - ./trino/etc:/usr/lib/trino/etc:ro
+      - ./trino/catalog:/etc/trino/catalog
+    environment:
+      - AWS_ACCESS_KEY_ID=admin
+      - AWS_SECRET_ACCESS_KEY=password
+      - AWS_REGION=us-east-1
+
 networks:
   iceberg_net:
